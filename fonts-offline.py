@@ -10,9 +10,10 @@
 '''Download recipes
 
 Usage:
-    fonts-offline [--ttf] <url>
+    fonts-offline [--ttf] [--font-path=<PATH>] <url>
 '''
 import docopt
+import pathlib as pl
 import re
 import requests
 
@@ -55,14 +56,16 @@ def get_font_file(url, local_filename,  headers):
     return local_filename
 
 
-def build_local_filenames(font_def):
+def build_local_filenames(font_def, font_path=''):
     template = 'font_{family}_{style}_{weight}.{type}'
     local_filenames = list()
     for url in font_def['urls']:
-        local_filenames.append(template.format(family=font_def['font-family'],
-                                               style=font_def['font-style'],
-                                               weight=font_def['font-weight'],
-                                               type=url.split('.')[-1]))
+        filename = template.format(family=font_def['font-family'],
+                                   style=font_def['font-style'],
+                                   weight=font_def['font-weight'],
+                                   type=url.split('.')[-1])
+        filepath = pl.Path(font_path) / filename
+        local_filenames.append(str(filepath))
     return local_filenames
 
 
@@ -77,7 +80,6 @@ def extract_information(main_css):
         font_def['font-style'] = get_style(font_face)
         font_def['font-weight'] = get_weight(font_face)
         font_def['urls'] = get_urls(font_face)
-        font_def['local_filenames'] = build_local_filenames(font_def)
         ret.append(font_def)
     return ret
 
@@ -93,12 +95,14 @@ def main():
                               'Firefox/38.0 Iceweasel/38.1.0')}
     if '--ttf' in arguments and arguments['--ttf']:
         headers = {}
+    font_path = arguments['--font-path'] if '--font-path' in arguments else ''
     result = requests.get(arguments['<url>'], headers=headers)
     result.encoding = 'utf-8'
     main_css = result.text
     font_defs = extract_information(main_css)
     output_css = main_css
     for font in font_defs:
+        font['local_filenames'] = build_local_filenames(font, font_path)
         for url, filename in zip(font['urls'], font['local_filenames']):
             get_font_file(url, filename, headers)
             output_css = replace_url(output_css, url, filename)
