@@ -47,7 +47,7 @@ class CSSParserTest(unittest.TestCase):
         output = css_downloader.get_urls(input_string)
         self.assertListEqual(expected, output)
 
-    def test_get_family(self):
+    def test_get_style(self):
         input_string = """
         @font-face {
         font-family: 'Roboto Condensed';
@@ -59,3 +59,62 @@ class CSSParserTest(unittest.TestCase):
         expected = 'Roboto Condensed'
         output = css_downloader.get_family(input_string)
         self.assertEqual(expected, output)
+
+    def test_get_family_broken(self):
+        input_string = """
+        @font-face {
+        font-famiy: 'Roboto Condensed';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        self.assertRaises(Exception, css_downloader.get_family, input_string)
+
+    def test_get_style(self):
+        input_string = """
+        @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        expected = 'normal'
+        output = css_downloader.get_style(input_string)
+        self.assertEqual(expected, output)
+
+    def test_get_style_broken(self):
+        input_string = """
+        @font-face {
+        font-family: 'Roboto Condensed';
+        font-stye: normal;
+        font-weight: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        self.assertRaises(Exception, css_downloader.get_style, input_string)
+
+    def test_get_weight(self):
+        input_string = """
+        @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        expected = '400'
+        output = css_downloader.get_weight(input_string)
+        self.assertEqual(expected, output)
+
+    def test_get_weight_broken(self):
+        input_string = """
+        @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weiht: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        self.assertRaises(Exception, css_downloader.get_weight, input_string)
