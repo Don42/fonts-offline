@@ -16,7 +16,7 @@ setup(
     author_email='don@0xbeef.org',
     url='https://github.com/Don42/fonts-offline',
     packages=find_packages(),
-    install_requires=['docopt', 'requests'],
+    install_requires=['pathlib', 'docopt', 'requests'],
     classifiers=[],
     scripts=['fonts-offline.py'],
 )
