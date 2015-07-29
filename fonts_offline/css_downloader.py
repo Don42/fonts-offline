@@ -13,11 +13,27 @@ import requests
 
 
 def get_urls(css):
+    """
+    Parse all URLs from a css font face declaration
+
+    :param css: CSS containing one font face declaration
+    :type css: str
+    :return: URLs in the font declaration
+    :rtype: list
+    """
     match = re.findall('url\(([^)]*)\)', css, re.MULTILINE)
     return match
 
 
 def get_family(css):
+    """
+    Parse the font family of a css font face declaration
+
+    :param css: CSS containing one font face declaration
+    :type css: str
+    :return: Family of the font
+    :rtype: str
+    """
     match = re.search('font-family: \'([^\']*)\';', css)
     if match:
         return match.group(1)
@@ -25,6 +41,14 @@ def get_family(css):
 
 
 def get_style(css):
+    """
+    Parse the font style of a css font face declaration
+
+    :param css: CSS containing one font face declaration
+    :type css: str
+    :return: Style of the font
+    :rtype: str
+    """
     match = re.search('font-style: ([^;]*);', css)
     if match:
         return match.group(1)
@@ -32,6 +56,14 @@ def get_style(css):
 
 
 def get_weight(css):
+    """
+    Parse the font weight of a css font face declaration
+
+    :param css: CSS containing one font face declaration
+    :type css: str
+    :return: Weight of the font
+    :rtype: str
+    """
     match = re.search('font-weight: ([^;]*);', css)
     if match:
         return match.group(1)
@@ -39,6 +71,20 @@ def get_weight(css):
 
 
 def get_font_file(url, local_filename,  headers):
+    """
+    Download font file and store it at using the provided file name
+
+    :param url: URL to the font file
+    :type url: str
+    :param local_filename: Filename to store the font file
+    :type local_filename: str
+    :param headers: Headers to use in the request
+    :type headers: dict
+    :return: Local filename
+    :rtype: str
+    :raises:
+        Exception: if there is an error while downloading
+    """
     r = requests.get(url, headers=headers, stream=True)
     if not r.ok:
         raise Exception("Error while retrieving font")
