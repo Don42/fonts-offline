@@ -118,3 +118,18 @@ class CSSParserTest(unittest.TestCase):
         url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
         }"""
         self.assertRaises(Exception, css_downloader.get_weight, input_string)
+
+    def test_replace_url(self):
+        input_string = "https://www.youtube.com/watch?v=q06xDugyxiw&list=PLp-wjw6lssYmrRD6jb2mMhpAYg8_kyS7-&index=19"
+        expected = "this_is_a_file.ttf"
+        output = css_downloader.replace_url(input_string,
+                                            ("https://www.youtube.com/watch?v=q06xDugyxiw&list="
+                                             "PLp-wjw6lssYmrRD6jb2mMhpAYg8_kyS7-&index=19"),
+                                            "this_is_a_file.ttf")
+        self.assertEqual(expected, output)
+        expected = "this_is_a_file.wopr"
+        output = css_downloader.replace_url(input_string,
+                                            ("https://www.youtube.com/watch?v=q06xDugyxiw&list="
+                                             "PLp-wjw6lssYmrRD6jb2mMhpAYg8_kyS7-&index=19"),
+                                            "this_is_a_file.wopr")
+        self.assertEqual(expected, output)
