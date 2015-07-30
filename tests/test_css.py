@@ -133,3 +133,26 @@ class CSSParserTest(unittest.TestCase):
                                              "PLp-wjw6lssYmrRD6jb2mMhpAYg8_kyS7-&index=19"),
                                             "this_is_a_file.wopr")
         self.assertEqual(expected, output)
+
+    def test_replace_url_multiline(self):
+        input_string = """
+        @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weiht: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        expected = """
+        @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weiht: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+        url(this_is_a_file.ttf) format('truetype');
+        }"""
+        output = css_downloader.replace_url(input_string,
+                                            ("http://fonts.gstatic.com/s/robotocondensed/v13/"
+                                             "Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf"),
+                                            "this_is_a_file.ttf")
+        self.assertEqual(expected, output)
