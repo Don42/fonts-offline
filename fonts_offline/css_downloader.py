@@ -96,6 +96,13 @@ def get_font_file(url, local_filename,  headers):
     return local_filename
 
 
+def download_css(headers, url):
+    result = requests.get(url, headers=headers)
+    result.encoding = 'utf-8'
+    main_css = result.text
+    return main_css
+
+
 def build_local_filenames(font_def, font_path=''):
     template = 'font_{family}_{style}_{weight}.{type}'
     local_filenames = list()
@@ -137,9 +144,7 @@ def get_url_file_pairs(main_css, font_path):
 
 
 def process_css_url(url, headers, font_path=''):
-    result = requests.get(url, headers=headers)
-    result.encoding = 'utf-8'
-    main_css = result.text
+    main_css = download_css(headers, url)
     url_name_pairs = get_url_file_pairs(main_css, font_path)
     for url, filename in url_name_pairs:
         get_font_file(url, filename, headers)
