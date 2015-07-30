@@ -27,6 +27,6 @@ def main():
                                   'Firefox/38.0 Iceweasel/38.1.0')}
 
     font_path = arguments['--font-path'] if '--font-path' in arguments else ''
-    css_downloader.process_css_url(arguments['<url>'],
-                                  headers,
-                                  font_path)
+    print(css_downloader.process_css_url(arguments['<url>'],
+                                         headers,
+                                         font_path))

@@ -128,15 +128,20 @@ def replace_url(css, url, local_filename):
     return css.replace(url, local_filename)
 
 
+def get_url_file_pairs(main_css, font_path):
+    font_defs = extract_information(main_css)
+    for font in font_defs:
+        font['local_filenames'] = build_local_filenames(font, font_path)
+        for pair in zip(font['urls'], font['local_filenames']):
+            yield pair
+
+
 def process_css_url(url, headers, font_path=''):
     result = requests.get(url, headers=headers)
     result.encoding = 'utf-8'
     main_css = result.text
-    font_defs = extract_information(main_css)
-    output_css = main_css
-    for font in font_defs:
-        font['local_filenames'] = build_local_filenames(font, font_path)
-        for url, filename in zip(font['urls'], font['local_filenames']):
-            get_font_file(url, filename, headers)
-            output_css = replace_url(output_css, url, filename)
-    print(output_css)
+    url_name_pairs = get_url_file_pairs(main_css, font_path)
+    for url, filename in url_name_pairs:
+        get_font_file(url, filename, headers)
+        main_css = replace_url(main_css, url, filename)
+    return main_css

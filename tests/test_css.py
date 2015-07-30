@@ -47,7 +47,7 @@ class CSSParserTest(unittest.TestCase):
         output = css_downloader.get_urls(input_string)
         self.assertListEqual(expected, output)
 
-    def test_get_style(self):
+    def test_get_family(self):
         input_string = """
         @font-face {
         font-family: 'Roboto Condensed';
