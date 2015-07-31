@@ -21,7 +21,6 @@ def test_download_css():
         assert m.call_count == 1
 
 
-
 def test_download_css_fail():
     with requests_mock.mock() as m:
         test_url = 'http://example.com/test.css'

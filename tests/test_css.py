@@ -156,3 +156,39 @@ class CSSParserTest(unittest.TestCase):
                                              "Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf"),
                                             "this_is_a_file.ttf")
         self.assertEqual(expected, output)
+
+    def test_build_local_filenames_single(self):
+        input = {'font-family': 'family',
+                 'font-style': 'style',
+                 'font-weight': 'weight',
+                 'urls': ['http://example.com/path/to/file/font.ttf']}
+        expected = ['font_family_style_weight.ttf']
+        assert css_downloader.build_local_filenames(input) == expected
+
+    def test_build_local_filenames_multi(self):
+        input = {'font-family': 'family',
+                 'font-style': 'style',
+                 'font-weight': 'weight',
+                 'urls': ['http://example.com/path/to/file/font.ttf',
+                          'http://example.com/path/to/file/font.woff']}
+        expected = ['font_family_style_weight.ttf',
+                    'font_family_style_weight.woff']
+        assert css_downloader.build_local_filenames(input) == expected
+
+    def test_build_local_filenames_single_with_path(self):
+        input = {'font-family': 'family',
+                 'font-style': 'style',
+                 'font-weight': 'weight',
+                 'urls': ['http://example.com/path/to/file/font.ttf']}
+        expected = ['fonts/font_family_style_weight.ttf']
+        assert css_downloader.build_local_filenames(input, 'fonts/') == expected
+
+    def test_build_local_filenames_multi_with_path(self):
+        input = {'font-family': 'family',
+                 'font-style': 'style',
+                 'font-weight': 'weight',
+                 'urls': ['http://example.com/path/to/file/font.ttf',
+                          'http://example.com/path/to/file/font.woff']}
+        expected = ['fonts/font_family_style_weight.ttf',
+                    'fonts/font_family_style_weight.woff']
+        assert css_downloader.build_local_filenames(input, 'fonts/') == expected
