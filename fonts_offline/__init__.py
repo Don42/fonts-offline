@@ -7,11 +7,11 @@
 # Marco 'don' Kaulea
 # ----------------------------------------------------------------------------
 
-'''Download fonts and create css to import them
+"""Download fonts and create css to import them
 
 Usage:
     fonts_offline [--ttf] [--font-path=<PATH>] <url>
-'''
+"""
 import docopt
 
 from fonts_offline import css_downloader
