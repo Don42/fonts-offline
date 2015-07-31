@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+tests/__pycache__/
 
 # C extensions
 *.so
@@ -58,3 +59,13 @@ target/
 
 # vim swap files
 *.swp
+
+# PyCharm
+.idea/
+
+# pyvenv
+bin/
+lib64
+lib/
+man/
+share/
