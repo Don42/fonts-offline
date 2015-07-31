@@ -98,6 +98,7 @@ def get_font_file(url, local_filename,  headers):
 
 def download_css(headers, url):
     result = requests.get(url, headers=headers)
+    result.raise_for_status()
     result.encoding = 'utf-8'
     main_css = result.text
     return main_css
