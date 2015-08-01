@@ -14,7 +14,6 @@ except ImportError:
     from mock import mock
 
 from fonts_offline import css_downloader
-import fonts_offline
 
 
 class CSSParserTest(unittest.TestCase):
@@ -163,92 +162,62 @@ class CSSParserTest(unittest.TestCase):
         self.assertEqual(expected, output)
 
     def test_build_local_filenames_single(self):
-        input = {'font-family': 'family',
+        input_string = {'font-family': 'family',
                  'font-style': 'style',
                  'font-weight': 'weight',
                  'urls': ['http://example.com/path/to/file/font.ttf']}
         expected = ['font_family_style_weight.ttf']
-        assert css_downloader.build_local_filenames(input) == expected
+        assert css_downloader.build_local_filenames(input_string) == expected
 
     def test_build_local_filenames_multi(self):
-        input = {'font-family': 'family',
+        input_string = {'font-family': 'family',
                  'font-style': 'style',
                  'font-weight': 'weight',
                  'urls': ['http://example.com/path/to/file/font.ttf',
                           'http://example.com/path/to/file/font.woff']}
         expected = ['font_family_style_weight.ttf',
                     'font_family_style_weight.woff']
-        assert css_downloader.build_local_filenames(input) == expected
+        assert css_downloader.build_local_filenames(input_string) == expected
 
     def test_build_local_filenames_single_with_path(self):
-        input = {'font-family': 'family',
+        input_string = {'font-family': 'family',
                  'font-style': 'style',
                  'font-weight': 'weight',
                  'urls': ['http://example.com/path/to/file/font.ttf']}
         expected = ['fonts/font_family_style_weight.ttf']
-        assert css_downloader.build_local_filenames(input, 'fonts/') == expected
+        assert css_downloader.build_local_filenames(input_string, 'fonts/') == expected
 
     def test_build_local_filenames_multi_with_path(self):
-        input = {'font-family': 'family',
+        input_string = {'font-family': 'family',
                  'font-style': 'style',
                  'font-weight': 'weight',
                  'urls': ['http://example.com/path/to/file/font.ttf',
                           'http://example.com/path/to/file/font.woff']}
         expected = ['fonts/font_family_style_weight.ttf',
                     'fonts/font_family_style_weight.woff']
-        assert css_downloader.build_local_filenames(input, 'fonts/') == expected
+        assert css_downloader.build_local_filenames(input_string, 'fonts/') == expected
 
-    @mock.patch('fonts_offline.css_downloader')
-    @mock.patch('docopt.docopt')
-    def test_main_ttf(self, doc, downloader):
-        doc.return_value = {'--ttf': True, '<url>': 'This is the url'}
-        downloader.process_css_url.return_value = 'This is css'
-        fonts_offline.main()
-        assert doc.call_count == 1
-        downloader.process_css_url.assert_called_once_with('This is the url',
-                                                           {},
-                                                           '')
-
-    @mock.patch('fonts_offline.css_downloader')
-    @mock.patch('docopt.docopt')
-    def test_main(self, doc, downloader):
-        doc.return_value = {'--ttf': False, '<url>': 'This is the url'}
-        downloader.process_css_url.return_value = 'This is css'
-        fonts_offline.main()
-        assert doc.call_count == 1
-        downloader.process_css_url.assert_called_once_with(
-            'This is the url',
-            {'User-agent': ('User-Agent: Mozilla/5.0 (X11;'
-                            ' Linux x86_64; rv:38.0) Gecko/20100101'
-                            'Firefox/38.0 Iceweasel/38.1.0')},
-            '')
-
-    @mock.patch('fonts_offline.css_downloader')
-    @mock.patch('docopt.docopt')
-    def test_main_ttf_with_path(self, doc, downloader):
-        doc.return_value = {'--ttf': True,
-                            '<url>': 'This is the url',
-                            '--font-path': 'path/to/fonts'}
-        downloader.process_css_url.return_value = 'This is css'
-        fonts_offline.main()
-        assert doc.call_count == 1
-        downloader.process_css_url.assert_called_once_with('This is the url',
-                                                           {},
-                                                           'path/to/fonts')
-
-    @mock.patch('fonts_offline.css_downloader')
-    @mock.patch('docopt.docopt')
-    def test_main_with_path(self, doc, downloader):
-        doc.return_value = {'--ttf': False,
-                            '<url>': 'This is the url',
-                            '--font-path': 'path/to/fonts'}
-        downloader.process_css_url.return_value = 'This is css'
-        fonts_offline.main()
-        assert doc.call_count == 1
-        downloader.process_css_url.assert_called_once_with(
-            'This is the url',
-            {'User-agent': ('User-Agent: Mozilla/5.0 (X11;'
-                            ' Linux x86_64; rv:38.0) Gecko/20100101'
-                            'Firefox/38.0 Iceweasel/38.1.0')},
-            'path/to/fonts')
-
+    def test_extract_information(self):
+        input_string = """
+        @font-face {
+            font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weiht: 400;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+             url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }
+        @font-face {
+            font-family: 'Roboto Slab';
+        font-style: bold;
+        font-weiht: 700;
+        src: local('Roboto Slab'), local('RobotoSlab-Bold'),
+             url(http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
+        }"""
+        expected = [{'font-family': 'Roboto Condensed',
+                     'font-style': 'normal',
+                     'font-weight': '400',
+                     'urls': ['http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf']},
+                    {'font-family': 'Roboto Slab',
+                     'font-style': 'bold',
+                     'font-weight': '700',
+                     'urls': ['http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf']}]
