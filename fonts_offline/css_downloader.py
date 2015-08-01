@@ -120,7 +120,7 @@ def extract_information(main_css):
     font_faces = main_css.split('@')
     ret = list()
     for font_face in font_faces:
-        if not font_face:
+        if not font_face or not font_face.strip():
             continue
         font_def = dict()
         font_def['font-family'] = get_family(font_face)

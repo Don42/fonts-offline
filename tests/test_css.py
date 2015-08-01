@@ -200,16 +200,16 @@ class CSSParserTest(unittest.TestCase):
     def test_extract_information(self):
         input_string = """
         @font-face {
-            font-family: 'Roboto Condensed';
+        font-family: 'Roboto Condensed';
         font-style: normal;
-        font-weiht: 400;
+        font-weight: 400;
         src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
              url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
         }
         @font-face {
-            font-family: 'Roboto Slab';
+        font-family: 'Roboto Slab';
         font-style: bold;
-        font-weiht: 700;
+        font-weight: 700;
         src: local('Roboto Slab'), local('RobotoSlab-Bold'),
              url(http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) format('truetype');
         }"""
@@ -221,3 +221,4 @@ class CSSParserTest(unittest.TestCase):
                      'font-style': 'bold',
                      'font-weight': '700',
                      'urls': ['http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf']}]
+        assert css_downloader.extract_information(input_string) == expected
