@@ -93,7 +93,6 @@ def get_font_file(url, local_filename,  headers):
             if chunk:
                 f.write(chunk)
                 f.flush()
-    return local_filename
 
 
 def download_css(headers, url):
