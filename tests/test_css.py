@@ -222,3 +222,77 @@ class CSSParserTest(unittest.TestCase):
                      'font-weight': '700',
                      'urls': ['http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf']}]
         assert css_downloader.extract_information(input_string) == expected
+
+    @mock.patch('fonts_offline.css_downloader.download_css')
+    @mock.patch('fonts_offline.css_downloader.get_font_file')
+    def test_process_css_url(self, get_font_file, download_css):
+        """
+
+        :type get_font_file: mock.Mock
+        :type download_css: mock.Mock
+        """
+        input_url = 'http://fonts.example.org/fonts.css'
+        input_header = {'Alpha': 'Bravo', 'Charlie': 'Delta'}
+        input_font_path = './fonts/'
+        download_css.return_value = (
+            "@font-face {"
+            "font-family: 'Roboto Condensed';"
+            "font-style: normal;"
+            "font-weight: 400;"
+            "src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),"
+            "     url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) "
+            "format('truetype');"
+            "}"
+            "@font-face {"
+            "font-family: 'Roboto Slab';"
+            "font-style: bold;"
+            "font-weight: 700;"
+            "src: local('Roboto Slab'), local('RobotoSlab-Bold'),"
+            "     url(http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) "
+            "format('truetype');"
+            "}")
+        expected = ("@font-face {"
+                    "font-family: 'Roboto Condensed';"
+                    "font-style: normal;"
+                    "font-weight: 400;"
+                    "src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),"
+                    "     url(fonts/font_Roboto Condensed_normal_400.ttf) format('truetype');"
+                    "}"
+                    "@font-face {"
+                    "font-family: 'Roboto Slab';"
+                    "font-style: bold;"
+                    "font-weight: 700;"
+                    "src: local('Roboto Slab'), local('RobotoSlab-Bold'),"
+                    "     url(fonts/font_Roboto Slab_bold_700.ttf) format('truetype');"
+                    "}")
+        output = css_downloader.process_css_url(input_url, input_header, input_font_path)
+        assert output == expected
+        download_css.assert_called_once_with(input_header, input_url)
+        assert get_font_file.called
+        assert get_font_file.call_count == 2
+        expected_calls = [
+            mock.call('http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf',
+                      'fonts/font_Roboto Condensed_normal_400.ttf',
+                      input_header),
+            mock.call('http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf',
+                      'fonts/font_Roboto Slab_bold_700.ttf',
+                      input_header)]
+        assert get_font_file.mock_calls == expected_calls
+
+    @mock.patch('fonts_offline.css_downloader.download_css')
+    @mock.patch('fonts_offline.css_downloader.get_font_file')
+    def test_process_css_url_empty(self, get_font_file, download_css):
+        """
+
+        :type get_font_file: mock.Mock
+        :type download_css: mock.Mock
+        """
+        input_url = ''
+        input_header = {}
+        input_font_path = ''
+        download_css.return_value = ''
+        output = css_downloader.process_css_url(input_url, input_header, input_font_path)
+        assert output == ''
+        download_css.assert_called_once_with({}, '')
+        assert not get_font_file.called
+        assert get_font_file.call_count == 0
