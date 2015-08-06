@@ -296,3 +296,44 @@ class CSSParserTest(unittest.TestCase):
         download_css.assert_called_once_with({}, '')
         assert not get_font_file.called
         assert get_font_file.call_count == 0
+
+    def test_get_url_file_pairs(self):
+        input_font_path = './static/fonts/'
+        input_css = (
+            "@font-face {"
+            "font-family: 'Roboto Condensed';"
+            "font-style: normal;"
+            "font-weight: 400;"
+            "src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),"
+            "     url(http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) "
+            "format('truetype');"
+            "}"
+            "@font-face {"
+            "font-family: 'Roboto Slab';"
+            "font-style: bold;"
+            "font-weight: 700;"
+            "src: local('Roboto Slab'), local('RobotoSlab-Bold'),"
+            "     url(http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf) "
+            "format('truetype');"
+            "}")
+        expected = [("http://fonts.gstatic.com/s/robotocondensed/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf",
+                     "static/fonts/font_Roboto Condensed_normal_400.ttf"),
+                    ("http://fonts.gstatic.com/s/robotoslab/v13/Zd2E9abXLFGSr9G3YK2MsDR-eWpsHSw83BRsAQElGgc.ttf",
+                     "static/fonts/font_Roboto Slab_bold_700.ttf")]
+        output = css_downloader.get_url_file_pairs(input_css, input_font_path)
+        assert iter(output) == iter(output)  # This is only true if it is a generator
+        assert list(output) == expected
+
+    def test_get_url_file_pairs_empty(self):
+        input_font_path = ''
+        input_css = (
+            "@font-face {"
+            "font-family: 'Roboto Condensed';"
+            "font-style: normal;"
+            "font-weight: 400;"
+            "src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),"
+            "     url(http://fon")
+        expected = []
+        output = css_downloader.get_url_file_pairs(input_css, input_font_path)
+        assert iter(output) == iter(output)  # This is only true if it is a generator
+        assert list(output) == expected
