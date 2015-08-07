@@ -113,3 +113,17 @@ government to spend the next nine months in attempting to improve it.
             assert os.path.isfile(ttf)
             with open(ttf, 'r') as file:
                 assert file.read() == data
+
+    def test_get_font_file_fail(self):
+        with requests_mock.mock() as m:
+            test_url = 'http://example.com/fonts/test.ttf'
+            data = ''
+            ttf = '/tmp/fonts-offline/font_Roboto_Regular_400.ttf'
+            m.get(test_url, text=data, status_code=400)
+            with pytest.raises(Exception):
+                css_downloader.get_font_file(test_url, ttf, {})
+            assert m.call_count == 1
+            request = m.request_history[0]
+            assert request.method == 'GET'
+            assert request.url == test_url
+            assert not os.path.exists(ttf)
